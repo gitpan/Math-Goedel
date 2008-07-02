@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Math-Goedel
+version:             0.01
+abstract:            Goedel number calculator
+license:             ~
+author:              
+    - KATOU Akira (turugina) <turugina@floralcompany.jp>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Exporter:                      0
+    List::MoreUtils:               0
+    List::Util:                    0
+    Math::Prime::XS:               0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3
