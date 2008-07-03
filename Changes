@@ -3,3 +3,9 @@ Revision history for Math-Goedel
 0.01    2008-07-02
         First version.
 
+0.02    2008-07-03
+        - implement 'offset' and 'reverse' options
+        - append validity check of input number.
+        - some changes on POD.
+        - fix version of requirement in Makefile.PL (require Exporter 5.57 for 'import' export)
+          http://www.nntp.perl.org/group/perl.cpan.testers/2008/07/msg1843497.html 

@@ -1,14 +1,15 @@
 --- #YAML:1.0
 name:                Math-Goedel
-version:             0.01
-abstract:            Goedel number calculator
+version:             0.02
+abstract:            Fundamental Goedel number calculator
 license:             ~
 author:              
     - KATOU Akira (turugina) <turugina@floralcompany.jp>
 generated_by:        ExtUtils::MakeMaker version 6.44
 distribution_type:   module
 requires:     
-    Exporter:                      0
+    Carp:                          0
+    Exporter:                      5.57
     List::MoreUtils:               0
     List::Util:                    0
     Math::Prime::XS:               0

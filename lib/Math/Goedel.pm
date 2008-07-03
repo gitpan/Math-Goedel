@@ -10,24 +10,38 @@ our @EXPORT_OK = qw/goedel/;
 use Math::Prime::XS qw/is_prime/;
 use List::Util qw/reduce max/;
 use List::MoreUtils qw/pairwise/;
+use Carp;
 
 =head1 NAME
 
-Math::Goedel - Goedel number calculator
+Math::Goedel - Fundamental Goedel number calculator
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
-    use Math::Goedel qw/goedel/;
+  use Math::Goedel qw/goedel/;
 
-    print goedel(9);  # will print 512 (2**9)
-    print goedel(81); # will print 768 (2**8 * 3**1)
-    print goedel(230);# will print 108 (2**2 * 3**3 * 5**0)
+  goedel(9);  # 512 (2**9)
+  goedel(81); # 768 (2**8 * 3**1)
+  goedel(230);# 108 (2**2 * 3**3 * 5**0)
 
-    print Math::Goedel::enc(9); # same as goedel(9)
+  Math::Goedel::enc(9); # same as goedel(9)
+
+  goedel(9, offset => 1); # 1024 (2**(9+1))
+  goedel(81, reverse => 1); # 13112 (2**1 * 3**8)
+
+=head1 DESCRIPTION
+
+Goedel number is calculated by following Goedel's encoding theorem
+
+  enc(X0X1X2...Xn) = P0**X0 * P1**X1 * P2**X2 * ..... * Pn**Xn
+
+I<Xk> is a I<k> th digit (from left hand) of input number.
+
+I<Pk> is a I<k> th prime number.
 
 =head1 EXPORT
 
@@ -35,19 +49,46 @@ our $VERSION = '0.01';
 
 =head1 FUNCTIONS
 
-=head2 goedel($n)
+=head2 goedel($n, %opts)
 
 calculate goedel number for I<n>
 
+=head3 %opts
+
+=head4 offset => $i
+
+According to fundamental theorem, goedel numbers are not unique.
+
+  goedel(23) == goedel(230); # 2**2 * 3**3 ( * 5**0 ) == 108
+
+To make it unique, you can specify I<offset> for I<Xk>
+
+  enc(X0X1X2...Xn) = P0**(X0 +i) * P1**(X1 +i) * P2**(X2 +i) * ..... * Pn**(Xn +i)
+
+so, 
+
+  goedel(23, offset => 1);  # 2**(2+1) * 3**(3+1) == 648
+  goedel(230, offset => 1); # 2**(2+1) * 3**(3+1) * 5**(0+1) == 3240
+
+=head4 reverse => 0|1
+
+This option is for same purpose as offset option.
+
+If reverse is set to 1, apply I<Xk> in reverse order,
+
+  enc(X0X1X2...Xn) = P0**Xn * P1**Xn-1 * P2**Xn-2 * ..... * Pn**X0
+
+so,
+
+  goedel(23,  reverse => 1); # 2**3 * 3**2 == 72
+  goedel(230, reverse => 1); # 2**0 * 3**3 * 5**2 == 675
+
 =cut
 
-my %_pow_cache = (
-  2 => [1,2,4,8,16,32,64,128,256,512]
-);
-my @_primes = (2);
+my %_pow_cache = ();
 my $_next_prime = sub
 {
-  my ($m) = @_;
+  my ($m, $offset) = @_;
   ++$m;
   while ( 1 ) {
     last if is_prime($m);
@@ -55,39 +96,64 @@ my $_next_prime = sub
   continue {
     ++$m;
   }
-  $_pow_cache{$m} =
-  [map { $m ** $_ } 0 .. 9];
-  $m;
+  $m => [map { $m ** ($_+$offset) } 0 .. 9];
 };
 
 sub goedel {
-  my ($n) = @_;
+  my $n_ = shift;
+  my %opts = (
+    q/offset/ => 0,
+    q/reverse/ => 0,
+    @_ );
+  
+  my $n = -1;
+  croak "n should be a non-negative integer"
+  if ( $n_ ne ($n = 0 + sprintf '%ld', $n_) || $n_ < 0);
+
+  my $offset = -1;
+  croak "offset should be a non-negative integer"
+  if ( $opts{q/offset/} ne ($offset = 0 + sprintf('%ld', $opts{q/offset/})) ||
+       $offset < 0);
+
+
   my $nlen = length($n);
 
-  push @_primes,$_next_prime->(max keys %_pow_cache)
-  while ( scalar(keys %_pow_cache) < $nlen );
+  $_pow_cache{$offset} = {} if !exists $_pow_cache{$offset};
+  my $pow_cache_ = $_pow_cache{$offset};
 
-  my @primes_ = @_primes[0 .. $nlen-1];
+  while ( scalar(keys %$pow_cache_) < $nlen ) {
+    my @cache_ = $_next_prime->(
+      (%$pow_cache_) ? (max keys %$pow_cache_) : 1,
+      $offset);
+    $pow_cache_->{$cache_[0]} = $cache_[1];
+  }
+
+  my @primes_ = (sort keys %$pow_cache_)[0 .. $nlen-1];
   my @digits_ = split //, $n;
+  @digits_ = reverse @digits_ if ($opts{q/reverse/});
 
   reduce { $a * $b }
-  pairwise { $_pow_cache{$a}[$b] }
+  pairwise { $pow_cache_->{$a}[$b] }
   @primes_, @digits_;
 }
 
 =head2 enc($n)
 
-synonym for goedel($n)
+synonym for goedel($n). but it won't be exported.
 
 =cut
 
-sub enc {
-  goedel(@_);
+{ no strict q/vars/;
+  no warnings;
+*enc = *goedel;
 }
 
-=head1 SEE ALSO
+=head1 REFERENCES
 
-L<http://en.wikipedia.org/wiki/G%C3%B6del_number>
+Goedel number: L<http://en.wikipedia.org/wiki/G%C3%B6del_number>
+
+Discussion of "how to make goedel number unique" (in Japanese):
+L<http://ja.doukaku.org/comment/4657/>, L<http://ja.doukaku.org/comment/4661/>
 
 =head1 AUTHOR
 

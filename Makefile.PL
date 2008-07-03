@@ -10,10 +10,11 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
         q{Test::More}       => 0,
-        q{Exporter}         => 0,
+        q{Exporter}         => q/5.57/,
         q{Math::Prime::XS}  => 0,
         q{List::Util}       => 0,
         q{List::MoreUtils}  => 0,
+        q{Carp}             => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Math-Goedel-*' },
