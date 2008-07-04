@@ -18,7 +18,7 @@ Math::Goedel - Fundamental Goedel number calculator
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -84,6 +84,12 @@ so,
   goedel(230, reverse => 1); # 2**0 * 3**3 * 5**2 == 675
 
 =cut
+
+#sub _pow
+#{
+#  $_[0]**$_[1];
+#}
+#memoize('_pow', NORMALIZER => sub {join ':', @_}, LIST_CACHE=>q/FAULT/);
 
 my %_pow_cache = ();
 my $_next_prime = sub
@@ -157,7 +163,7 @@ L<http://ja.doukaku.org/comment/4657/>, L<http://ja.doukaku.org/comment/4661/>
 
 =head1 AUTHOR
 
-KATOU Akira (turugina), C<< <turugina at floralcompany.jp> >>
+KATOU Akira (turugina), C<< <turugina at cpan.org> >>
 
 =head1 BUGS
 

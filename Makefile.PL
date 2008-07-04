@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME                => 'Math::Goedel',
-    AUTHOR              => 'KATOU Akira (turugina) <turugina@floralcompany.jp>',
+    AUTHOR              => 'KATOU Akira (turugina) <turugina@cpan.org>',
     VERSION_FROM        => 'lib/Math/Goedel.pm',
     ABSTRACT_FROM       => 'lib/Math/Goedel.pm',
     PL_FILES            => {},
