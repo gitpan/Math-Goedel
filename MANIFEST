@@ -1,7 +1,11 @@
 Changes
+LICENSE
 MANIFEST
+MANIFEST.SKIP
+META.yml
 Makefile.PL
 README
+dist.ini
 lib/Math/Goedel.pm
 t/00_load.t
 t/01_goedel.t
@@ -12,4 +16,3 @@ t/51_not_exported.t
 t/80_performance.t
 t/98_pod.t
 t/99_pod_coverage.t
-META.yml                                 Module meta-data (added by MakeMaker)
